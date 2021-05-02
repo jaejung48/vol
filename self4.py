@@ -29,7 +29,7 @@ bot.sendMessage(chat_id = tlgm_id, text = 'Crypto Commando')
 abp = 0                                                                                    
 current_price = 0
 margin = 0
-weight = 20000                                                                      
+weight = 10000                                                                      
 
 #########################################################################
 # 전체 코인 티커 조회
