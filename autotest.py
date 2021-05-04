@@ -9,15 +9,6 @@ access = "4bAGnrGccIFCZ1nZyhgNGx7itfJNBmomDtF61i69"							    # 엑세스 키 �
 secret = "ZzxALJxXMf71E4pmMFdSWxMuJo4nTx0hBIzJ0fFU"		
 upbit = pyupbit.Upbit(access, secret)	
 
-#########################################################################
-# 텔레그램 연결
-#########################################################################
-import telegram                                                                 
-tlgm_token = '1770499141:AAFGgivsAkLTLKnZU2bQb8cDxcNC1eCUr_o'                   
-tlgm_id = '1146999309'                                                          
-bot = telegram.Bot(token = tlgm_token)                                          
-updates = bot.getUpdates()                                                      
-bot.sendMessage(chat_id = tlgm_id, text = 'Crypto Commando')   
 
 # 초기 세팅
 tickers = pyupbit.get_tickers(fiat = "KRW")
@@ -177,38 +168,12 @@ while True:
                 print("#############################################################")
                 print("buy condition 0. New trigger. more simple")
                 print("#############################################################")
-                bot.sendMessage(chat_id = tlgm_id, text = '매수')
-                bot.sendMessage(chat_id = tlgm_id, text = max_margin)
-                bot.sendMessage(chat_id = tlgm_id, text = margin)
                 buy_record0 = upbit.buy_market_order(ticker, total_weight)
                         
                 pprint.pprint(buy_record0) 
                 print("-------------------------------------------------------------")
 
-    #########################################################################
-    # 매수 2조건. resist_line 활용 
-    ######################################################################### 
-    #if nlt == 1 and line1 < line2 and last_ma5 > resist_line * 1.001 and ma5_trend > 0 :
-     #   if ticker_balance >= 0 and ticker_balance * current_price <= 6000 :
-      #      print("#############################################################")
-       #     print("buy condition 1. New trigger. more simple")
-        #    bot.sendMessage(chat_id = tlgm_id, text = ticker)
-         #   bot.sendMessage(chat_id = tlgm_id, text = 'buy condition 0. New trigger. more simple')
-          #  print("#############################################################")
-           # buy_record0 = upbit.buy_market_order(ticker, total_weight)
-            #pprint.pprint(buy_record0)
-     #       print("#############################################################")
-      #      print("buy_market_order is conducted")
-       #     print("#############################################################")
-            
-      #      nlt = 0             # 매수가 끝났으니 다시 갱신되도록 nlt 0으로 만들기
-       #     resist_line = current_price
-        #    print("nlt is 0 now")
-         #   print("---------------------------------------------------")
-          #  sell_trigger = 1
-           # print("sell_trigger reloaded")
-           # print("---------------------------------------------------")
-            
+   
 
     #########################################################################
     # 익절 조건. 마진과 익절값 활용. 
@@ -233,9 +198,6 @@ while True:
             if ticker_balance * abp > 0 :
                 print("#############################################################")
                 print("sell condition 3. Loss Cut by Loss Cut")
-                bot.sendMessage(chat_id = tlgm_id, text = '3. Loss Cut')
-                bot.sendMessage(chat_id = tlgm_id, text = max_margin)
-                bot.sendMessage(chat_id = tlgm_id, text = margin)
                 print("#############################################################")
                 sell_record0 = upbit.sell_market_order(ticker, ticker_balance)
                 pprint.pprint(sell_record0)
