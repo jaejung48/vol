@@ -1,4 +1,5 @@
 
+
 # 업비트 API 로그인
 import pyupbit						
 import time		
@@ -226,6 +227,14 @@ while True:
         ma20_m30_197 = ma20_m30[197]
         ma20_m30_trend_199 = ma20_m30_199 - ma20_m30_198
         ma20_m30_trend_198 = ma20_m30_198 - ma20_m30_197
+
+        window20_m30 = c_m30.rolling(60)                                          
+        ma60_m30 = window20_m30.mean()
+        ma60_m30_199 = ma60_m30[199]
+        ma60_m30_198 = ma60_m30[198]
+        ma60_m30_197 = ma60_m30[197]
+        ma60_m30_trend_199 = ma60_m30_199 - ma60_m30_198
+        ma60_m30_trend_198 = ma60_m30_198 - ma60_m30_197
         
         
 
@@ -238,14 +247,14 @@ while True:
     #########################################################################
     # 매수 0조건. previous_min_lp와 ma5 상향 돌파 
     ######################################################################### 
-        if ma5_m30_trend_198 > 0 and ma20_m30_trend_198 > 0 and ma60_m3_trend_199 > 0:
+        if ma5_m30_trend_198 > 0 and ma20_m30_trend_198 > 0 and ma60_m30_trend_199 > 0:
             print("첫번째 :", ticker)
             if ma5_m30[199] > ma20_m30[199] and ma5_m30[198] > ma20_m30[198] :
                 print("두번째 :", ticker)
                 if current_price > m30_max_close_180_198 and current_price < m30_max_high_180_198 :
-                    bot.sendMessage(chat_id = tlgm_id, text = ticker+' 세번쨰')
                     if (current_price - c_m30[195])/c_m30[195] < 0.15 :
                         if (h_m30[198] - current_price)/h_m30[198] < 0.03 :
+                            bot.sendMessage(chat_id = tlgm_id, text = ticker+' 선택')
                             print(ticker, " 화이팅")
                             profit = (ma5_m30_199 - ma20_m30_199) / ma20_m30_199
                             
@@ -265,17 +274,17 @@ while True:
             #if current_price > abp * 1.05 :
              #   sell_record0 = upbit.sell_market_order(ticker, ticker_balance/2)
               #  pprint.pprint(sell_record0) 
-                                if profit > 0.007 :
+                                if current_price > abp * 1.03 :
                                     bot.sendMessage(chat_id = tlgm_id, text = ticker+'축하')
                                     bot.sendMessage(chat_id = tlgm_id, text = margin)
                                     sell_record0 = upbit.sell_market_order(ticker, ticker_balance)
                                     pprint.pprint(sell_record0)  
                                     print("수익 완료", ticker, margin)
-
                                     nlt = 0 
+                                   
            
     #######################################################################
-    # 손절 조건. 로스컷 도달 시 전량 매도
+    # 손절 조건. 로스컷 도달 시 전량 매
     #########################################################################          
                             if current_price < ma20_m30[199] :
                                 bot.sendMessage(chat_id = tlgm_id, text = ticker+' 손절')
