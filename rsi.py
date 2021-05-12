@@ -13,12 +13,12 @@ upbit = pyupbit.Upbit(access, secret)
 #########################################################################
 # 텔레그램 연결
 #########################################################################
-import telegram                                                                 
-tlgm_token = '1770499141:AAFGgivsAkLTLKnZU2bQb8cDxcNC1eCUr_o'                   
-tlgm_id = '1146999309'                                                          
-bot = telegram.Bot(token = tlgm_token)                                          
-updates = bot.getUpdates()                                                      
-bot.sendMessage(chat_id = tlgm_id, text = 'Crypto Commando') 
+#import telegram                                                                 
+#tlgm_token = '1770499141:AAFGgivsAkLTLKnZU2bQb8cDxcNC1eCUr_o'                   
+#tlgm_id = '1146999309'                                                          
+#bot = telegram.Bot(token = tlgm_token)                                          
+#updates = bot.getUpdates()                                                      
+#bot.sendMessage(chat_id = tlgm_id, text = 'Crypto Commando') 
 
 # 초기 세팅
 tickers = pyupbit.get_tickers(fiat = "KRW")
@@ -182,9 +182,27 @@ while True:
     
             RS = _gain / _loss
             return pd.Series(100 - (100 / (1 + RS)), name="RSI")
+        rsi = rsi(ticker_df_m30, 14).iloc[-1]
+
+        def rsi1(ticker_df_m30, period: int = 14):
+            c_m30 = ticker_df_m30['close']
+            delta = c_m30.diff()
     
-        rsi = rsi(ticker_df_m30, 14).iloc[-3]
-           
+            up, down = delta.copy(), delta.copy()
+            up[up < 0] = 0
+            down[down > 0] = 0
+    
+            _gain = up.ewm(com=(period - 1), min_periods=period).mean()
+            _loss = down.abs().ewm(com=(period - 1), min_periods=period).mean()
+    
+            RS = _gain / _loss
+            return pd.Series(100 - (100 / (1 + RS)), name="RSI")    
+        rsi1 = rsi1(ticker_df_m30, 14).iloc[-2]
+
+        rsiup = rsi - rsi1
+        
+        print(ticker, rsiup)
+        
     #########################################################################
     # 매 반복 시 출력 정보
     #########################################################################
@@ -193,49 +211,49 @@ while True:
     #########################################################################
     # 매수 0조건. previous_min_lp와 ma5 상향 돌파 
     ######################################################################### 
-        if rsi < 60 and c_m30_197 < bd20_m30_197 :
+        
+        if ma5_m30_trend_199 > 0 and ma20_m30_trend_199 > 0 :
             print(ticker, "첫번째")
-            if o_m30_197 > c_m30_197 and o_m30_198 < c_m30_198 :
+            if 50 < rsi < 70 and rsiup > 4 :
                 print(ticker, "두번째")
-                if (o_m30_197 - c_m30_197) / 2 > c_m30_198 :
-                    if ticker in wave :                     
-                        print(ticker, "Wave")
+                if ticker in wave :                     
+                    print(ticker, "Wave")
                     
-                    else:
-                        wave.append(ticker)
+                else:
+                    wave.append(ticker)
 
-                    buy_record0 = upbit.buy_market_order(ticker, total_weight)
-                    pprint.pprint(buy_record0)
+                buy_record0 = upbit.buy_market_order(ticker, total_weight)
+                pprint.pprint(buy_record0)
 
 
-                if ticker_balance > 0 :
-                    margin = (current_price - abp)/abp
-                    print(margin)
+            if ticker_balance > 0 :
+                margin = (current_price - abp)/abp
+                print(margin)
              
 
-                if abp == 0 :
-                    margin = 0  
+            if abp == 0 :
+                margin = 0  
     #########################################################################
     # 익절 조건. 마진과 익절값 활용. 
     #########################################################################     
-                if ticker_balance * current_price > 5000 :
+            if ticker_balance * current_price > 5000 :
 
-                    if  l_m30_197 > current_price :
-                        sell_record0 = upbit.sell_market_order(ticker, ticker_balance)
-                        pprint.pprint(sell_record0)
-                        print("수익 완료", ticker, margin)
-                        nlt = 0 
-                        abp = 0
-                        margin = 0
+                if  margin > 0.01 :
+                    sell_record0 = upbit.sell_market_order(ticker, ticker_balance)
+                    pprint.pprint(sell_record0)
+                    print("수익 완료", ticker, margin)
+                    nlt = 0 
+                    abp = 0
+                    margin = 0
                                    
            
     #######################################################################
     # 손절 조건. 로스컷 도달 시 전량 매
     #########################################################################          
-        #if margin < 0.05 :
-            #bot.sendMessage(chat_id = tlgm_id, text = ticker+' 손절')
-            #sell_record0 = upbit.sell_market_order(ticker, ticker_balance)
-            #pprint.pprint(sell_record0)
+            if margin < -0.03 :
+                #bot.sendMessage(chat_id = tlgm_id, text = ticker+' 손절')
+                sell_record0 = upbit.sell_market_order(ticker, ticker_balance)
+                pprint.pprint(sell_record0)
                                     
     #########################################################################
     # 자동 갱신 조건들. 매수평균가, 손절가, 최고수익률, 최고 최저가
